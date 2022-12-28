@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:instagram_flutter/ressources/auth_methods.dart';
 import 'package:instagram_flutter/utils/colors.dart';
+import 'package:instagram_flutter/utils/utils.dart';
 import 'package:instagram_flutter/widgets/text_field_input.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,12 +15,29 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
+  bool _isLoading = false;
   @override
   void dispose() {
     super.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+  }
+
+  void loginUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+    String res = await AuthMethods().loginUser(
+        email: _emailController.text, password: _passwordController.text);
+
+
+    if (res == 'success') {
+    } else {
+      showSnackBar(res, context);
+    }
+     setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -55,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 24),
               InkWell(
                   child: Container(
-                child: const Text('Log in'),
+                    child: _isLoading ? const Center(child: CircularProgressIndicator(color: primaryColor),):  const Text('Login'),
                 width: double.infinity,
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -80,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                   ),
                   GestureDetector(
-                      onTap: () {},
+                      onTap: loginUser,
                       child: Container(
                         child: const Text(' Sign up',
                             style: TextStyle(fontWeight: FontWeight.bold)),
